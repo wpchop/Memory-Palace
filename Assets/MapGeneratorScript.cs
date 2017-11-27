@@ -1,0 +1,144 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Palace;
+
+public class MapGeneratorScript : MonoBehaviour {
+
+	public int numPhotos;
+
+	private int gridSize;
+
+	public string seed;
+	public bool useRandom;
+
+	[Range(0,100)]
+	public int randomFillPercent;
+
+	public Transform wall;
+
+	public Transform hall;
+
+	public Transform photo;
+
+	List<Room> rooms;
+	int[,] map;
+
+
+	private double radius = 4;
+
+	void Start() {
+		GenerateRooms ();
+	}
+
+	void GenerateRooms() {
+		gridSize = numPhotos * numPhotos;
+		rooms = new List<Room> ();
+		map = new int[gridSize, gridSize];
+		RandomFillMap ();
+		drawRooms ();
+	}
+
+	void RandomFillMap() {
+		if (useRandom) {
+			seed = Time.time.ToString();
+		}
+
+		System.Random pseudo = new System.Random (seed.GetHashCode ());
+
+		for (int x = 0; x < numPhotos; x++) {
+			for (int y = 0; y < numPhotos; y++) {
+				map[x,y] = (pseudo.Next(0,100) < randomFillPercent)?1: 0;
+				if (pseudo.Next (0, 100) < randomFillPercent) {
+					Room newRoom = new Room (x, y, numPhotos, numPhotos);
+					rooms.Add (newRoom);
+				}
+			}
+		}
+	}
+
+	void drawRooms() {
+		if (rooms != null) {
+			foreach (Room room in rooms) {
+				float x = -gridSize / 2 + room.centerX * 10 + 0.5f;
+				float y = -gridSize / 2 + room.centerY * 10 + 0.5f;
+				int w = room.width;
+				int h = room.height;
+				// drawing the first room
+				for (int i = -w / 2; i < w / 2; i++) {
+					for (int j = -h / 2; j < h / 2; j++) {
+						Vector3 pos = new Vector3 (x + i, 0, y + j);
+						// Gizmos.DrawCube (pos, Vector3.one);	
+						if (i == -w / 2 || i == w / 2 - 1 || j == -h / 2  || j == h / 2 - 1) {
+							Instantiate (wall, pos, Quaternion.identity);
+						}
+					}
+				}
+
+				Vector3 position = new Vector3 (x, 2, y);
+				Instantiate (photo, position, Quaternion.identity);
+
+				foreach (Room room2 in rooms) {
+					if (room2 != room) {
+						if (room.getDistanceFrom (room2) < radius) {
+							DrawHallway (room, room2);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void DrawHallway(Room room1, Room room2) {
+		int x1 = room1.centerX;
+		int x2 = room2.centerX;
+		int y1 = room1.centerY;
+		int y2 = room2.centerY;
+
+		// Same horizontal axis
+		if (x1 == x2) {
+			float x = -gridSize / 2 + x1 * 10 + 0.5f;
+			float miny = -gridSize / 2 + Mathf.Min (y1, y2) * 10 + 0.5f;
+			float maxy = -gridSize / 2 + Mathf.Max (y1, y2) * 10 + 0.5f;
+			for (int i = (int)miny; i < (int)maxy; i++) {
+				Vector3 pos = new Vector3 (x, 0, i);
+				pos = new Vector3 (x - 1, 0, i);
+			}
+		} else if (y1 == y2) {
+			float y = -gridSize / 2 + y1 * 10 + 0.5f;
+			float minx = -gridSize / 2 + Mathf.Min (x1, x2) * 10 + 0.5f;
+			float maxx = -gridSize / 2 + Mathf.Max (x1, x2) * 10 + 0.5f;
+			for (int i = (int)minx; i < (int)maxx; i++) {
+				Vector3 pos = new Vector3 (i, 0, y);
+				pos = new Vector3 (i, 0, y-1);
+			}
+		} else {
+			//only draw if room1 is to the left of room2
+
+			if (x1 < x2) {
+				float startx = -gridSize / 2 + x1 * 10 + 0.5f;
+				float endx = -gridSize / 2 + x2 * 10 + 0.5f;
+				float starty = -gridSize / 2 + y1 * 10 + 0.5f;
+				float endy = -gridSize / 2 + y2 * 10 + 0.5f;
+				for (int i = (int) Mathf.Floor(startx + room1.width/2); i <= (int)endx; i++) {
+					Vector3 pos = new Vector3 (i, 0, starty);
+					Instantiate(hall, pos, Quaternion.identity);
+					pos = new Vector3 (i, 0, starty - 1);
+					Instantiate(hall, pos, Quaternion.identity);
+				}
+				if (starty > endy) {
+					float temp = endy;
+					endy = starty;
+					starty = temp;
+				}
+				for (int i = (int)starty - 1; i < (int)endy; i++) {
+					Vector3 pos = new Vector3 (endx, 0, i);
+					Instantiate(hall, pos, Quaternion.identity);
+					pos = new Vector3 (endx - 1, 0, i);
+					Instantiate(hall, pos, Quaternion.identity);
+				}
+			}
+		}
+	}
+
+}
