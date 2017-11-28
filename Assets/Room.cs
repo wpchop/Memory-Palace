@@ -9,7 +9,11 @@ namespace Palace {
 		public int width;
 		public int height;
 
+		public bool[] walls;
+
 		List<Room> nearestNeighbors;
+
+		public enum Wall {top, bottom, left, right};
 
 		public Room (int x, int y, int width, int height)
 		{
@@ -18,6 +22,7 @@ namespace Palace {
 			this.width = width;
 			this.height = height;
 			nearestNeighbors = new List<Room> ();
+			walls = new bool[4];
 		}
 
 		public void addNearestNeighbors(Room neighbor) {
@@ -30,8 +35,8 @@ namespace Palace {
 			return Math.Sqrt (dx * dx + dy * dy);
 		}
 
-		void onDrawGizmos() {
-
+		public void makeDoor(Wall wall) {
+			walls [(int)wall] = true;
 		}
 	}
 }

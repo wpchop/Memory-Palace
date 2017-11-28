@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Palace;
+using System;
 
 public class MapGeneratorScript : MonoBehaviour {
 
@@ -57,31 +58,67 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 	}
 
-	void drawRooms() {
-		if (rooms != null) {
-			foreach (Room room in rooms) {
-				float x = -gridSize / 2 + room.centerX * 10 + 0.5f;
-				float y = -gridSize / 2 + room.centerY * 10 + 0.5f;
-				int w = room.width;
-				int h = room.height;
-				// drawing the first room
-				for (int i = -w / 2; i < w / 2; i++) {
-					for (int j = -h / 2; j < h / 2; j++) {
-						Vector3 pos = new Vector3 (x + i, 0, y + j);
-						// Gizmos.DrawCube (pos, Vector3.one);	
-						if (i == -w / 2 || i == w / 2 - 1 || j == -h / 2  || j == h / 2 - 1) {
-							Instantiate (wall, pos, Quaternion.identity);
-						}
-					}
+	void drawRoom(Room room) {
+		float x = -gridSize / 2 + room.centerX * 10 + 0.5f;
+		float y = -gridSize / 2 + room.centerY * 10 + 0.5f;
+		int w = room.width;
+		int h = room.height;
+
+		// If no top opening
+		if (room.walls [(int)Room.Wall.top]) {
+			// Top and bottom walls
+			for (int i = -w / 2; i < w / 2; i++) {
+				Vector3 pos = new Vector3 (x + i, 0, y - h / 2);
+				Instantiate (wall, pos, Quaternion.identity);
+			}
+		} else {
+			for (int i = -w / 2; i < w / 2; i++) {
+				if (i != -1 && i != 0) {
+					Vector3 pos = new Vector3 (x + i, 0, y - h / 2);
+					Instantiate (wall, pos, Quaternion.identity);
 				}
+			}
+		}
 
-				Vector3 position = new Vector3 (x, 2, y);
-				Instantiate (photo, position, Quaternion.identity);
+		// bottom
+		if (room.walls [(int)Room.Wall.bottom]) {
+			// Top and bottom walls
+			for (int i = -w / 2; i < w / 2; i++) {
+				Vector3 pos = new Vector3 (x + i, 0, y + h / 2 - 1);
+				Instantiate (wall, pos, Quaternion.identity);
 
+			} 
+		} else {
+			for (int i = -w / 2; i < w / 2; i++) {
+				if (i != 0 && i != -1) {
+					Vector3 pos = new Vector3 (x + i, 0, y + h / 2 - 1);
+					Instantiate (wall, pos, Quaternion.identity);
+				}
+			}
+		}
+
+
+		// Left and right walls
+		for (int j = -h / 2; j < h / 2; j++) {
+			Vector3 pos = new Vector3 (x + w/2 - 1, 0, y + j);
+			Instantiate (wall, pos, Quaternion.identity);
+			pos = new Vector3 (x - w / 2, 0, y + j);
+			Instantiate (wall, pos, Quaternion.identity);
+		}
+
+		// Add photos
+		Vector3 position = new Vector3 (x, 2, y);
+		Instantiate (photo, position, Quaternion.identity);
+	}
+
+	void drawRooms() {
+	  if (rooms != null) {
+			foreach (Room room in rooms) {
+				drawRoom (room);
 				foreach (Room room2 in rooms) {
 					if (room2 != room) {
 						if (room.getDistanceFrom (room2) < radius) {
-							DrawHallway (room, room2);
+							// DrawHallway (room, room2);
 						}
 					}
 				}
@@ -114,7 +151,6 @@ public class MapGeneratorScript : MonoBehaviour {
 			}
 		} else {
 			//only draw if room1 is to the left of room2
-
 			if (x1 < x2) {
 				float startx = -gridSize / 2 + x1 * 10 + 0.5f;
 				float endx = -gridSize / 2 + x2 * 10 + 0.5f;
