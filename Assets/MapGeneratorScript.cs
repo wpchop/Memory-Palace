@@ -64,17 +64,26 @@ public class MapGeneratorScript : MonoBehaviour {
 		int w = room.width;
 		int h = room.height;
 
+		// for straight hallway ||
+		Vector3 gridPos = new Vector3 (x - 2f, 0, y - 0.5f);
+		Instantiate (hall, gridPos, Quaternion.identity);
+
+		Vector3 pos = new Vector3 (x, 0, y);
+		// for horizontal straight hallway =
+		gridPos = new Vector3 (x - 0.5f, 0, y + 1f);
+		//Instantiate (hall, gridPos, Quaternion.AngleAxis (90, new Vector3 (0, 1, 0)));
+
 		// If no top opening
 		if (room.walls [(int)Room.Wall.top]) {
 			// Top and bottom walls
 			for (int i = -w / 2; i < w / 2; i++) {
-				Vector3 pos = new Vector3 (x + i, 0, y - h / 2);
+				pos = new Vector3 (x + i, 0, y - h / 2);
 				Instantiate (wall, pos, Quaternion.identity);
 			}
 		} else {
 			for (int i = -w / 2; i < w / 2; i++) {
 				if (i != -1 && i != 0) {
-					Vector3 pos = new Vector3 (x + i, 0, y - h / 2);
+					pos = new Vector3 (x + i, 0, y - h / 2);
 					Instantiate (wall, pos, Quaternion.identity);
 				}
 			}
@@ -84,31 +93,61 @@ public class MapGeneratorScript : MonoBehaviour {
 		if (room.walls [(int)Room.Wall.bottom]) {
 			// Top and bottom walls
 			for (int i = -w / 2; i < w / 2; i++) {
-				Vector3 pos = new Vector3 (x + i, 0, y + h / 2 - 1);
+				pos = new Vector3 (x + i, 0, y + h / 2 - 1);
 				Instantiate (wall, pos, Quaternion.identity);
 
 			} 
 		} else {
 			for (int i = -w / 2; i < w / 2; i++) {
 				if (i != 0 && i != -1) {
-					Vector3 pos = new Vector3 (x + i, 0, y + h / 2 - 1);
+					pos = new Vector3 (x + i, 0, y + h / 2 - 1);
 					Instantiate (wall, pos, Quaternion.identity);
 				}
 			}
 		}
 
-
-		// Left and right walls
-		for (int j = -h / 2; j < h / 2; j++) {
-			Vector3 pos = new Vector3 (x + w/2 - 1, 0, y + j);
-			Instantiate (wall, pos, Quaternion.identity);
-			pos = new Vector3 (x - w / 2, 0, y + j);
-			Instantiate (wall, pos, Quaternion.identity);
+		//left
+		if (room.walls [(int)Room.Wall.left]) {
+			for (int j = -h / 2; j < h / 2; j++) {
+				pos = new Vector3 (x - w / 2, 0, y + j);
+				Instantiate (wall, pos, Quaternion.identity);
+			}
+		} else {
+			for (int j = -h / 2; j < h / 2; j++) {
+				if (j != 0 && j != -1) {
+					pos = new Vector3 (x - w / 2, 0, y + j);
+					Instantiate (wall, pos, Quaternion.identity);
+				}
+			}
 		}
+
+		//right
+		if (room.walls [(int)Room.Wall.right]) {
+			for (int j = -h / 2; j < h / 2; j++) {
+				pos = new Vector3 (x + w / 2 - 1, 0, y + j);
+				Instantiate (wall, pos, Quaternion.identity);
+			}
+		} else {
+			for (int j = -h / 2; j < h / 2; j++) {
+				if (j != 0 && j != -1) {
+					pos = new Vector3 (x + w / 2 - 1, 0, y + j);
+					Instantiate (wall, pos, Quaternion.identity);
+				}
+			}
+		}
+			
+		// Left and right walls
+//		for (int j = -h / 2; j < h / 2; j++) {
+//			Vector3 pos = new Vector3 (x + w/2 - 1, 0, y + j);
+//			Instantiate (wall, pos, Quaternion.identity);
+//			pos = new Vector3 (x - w / 2, 0, y + j);
+//			Instantiate (wall, pos, Quaternion.identity);
+//		}
 
 		// Add photos
 		Vector3 position = new Vector3 (x, 2, y);
 		Instantiate (photo, position, Quaternion.identity);
+
 	}
 
 	void drawRooms() {
@@ -118,12 +157,18 @@ public class MapGeneratorScript : MonoBehaviour {
 				foreach (Room room2 in rooms) {
 					if (room2 != room) {
 						if (room.getDistanceFrom (room2) < radius) {
-							// DrawHallway (room, room2);
+							//DrawHallway (room, room2);
 						}
 					}
 				}
 			}
+
+
 		}
+	}
+
+	void makeNeighbors(Room r1, Room r2) {
+		
 	}
 
 	void DrawHallway(Room room1, Room room2) {
@@ -157,9 +202,9 @@ public class MapGeneratorScript : MonoBehaviour {
 				float starty = -gridSize / 2 + y1 * 10 + 0.5f;
 				float endy = -gridSize / 2 + y2 * 10 + 0.5f;
 				for (int i = (int) Mathf.Floor(startx + room1.width/2); i <= (int)endx; i++) {
-					Vector3 pos = new Vector3 (i, 0, starty);
+					Vector3 pos = new Vector3 (i, 0, starty + 1);
 					Instantiate(hall, pos, Quaternion.identity);
-					pos = new Vector3 (i, 0, starty - 1);
+					pos = new Vector3 (i, 0, starty - 2);
 					Instantiate(hall, pos, Quaternion.identity);
 				}
 				if (starty > endy) {
@@ -168,9 +213,9 @@ public class MapGeneratorScript : MonoBehaviour {
 					starty = temp;
 				}
 				for (int i = (int)starty - 1; i < (int)endy; i++) {
-					Vector3 pos = new Vector3 (endx, 0, i);
+					Vector3 pos = new Vector3 (endx + 1, 0, i);
 					Instantiate(hall, pos, Quaternion.identity);
-					pos = new Vector3 (endx - 1, 0, i);
+					pos = new Vector3 (endx - 2, 0, i);
 					Instantiate(hall, pos, Quaternion.identity);
 				}
 			}

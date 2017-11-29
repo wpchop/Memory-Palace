@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 389073e57ba974eed8de499c64ad3866
-timeCreated: 1508891920
+timeCreated: 1511918022
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - wall: {instanceID: 0}
+  - hall: {fileID: 4431502336239926, guid: 48f8b907c29694041adedd08fe8b9610, type: 2}
+  - photo: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
