@@ -18,6 +18,14 @@ public class MapGeneratorScript : MonoBehaviour {
 
 	public Transform wall;
 
+	public Transform hallCorner;
+
+	public Transform hallStraight;
+
+	public Transform hallCross;
+
+	public Transform hallT;
+
 	public Transform hall;
 
 	public Transform photo;
@@ -65,13 +73,14 @@ public class MapGeneratorScript : MonoBehaviour {
 		int h = room.height;
 
 		// for straight hallway ||
-		Vector3 gridPos = new Vector3 (x - 2f, 0, y - 0.5f);
-		Instantiate (hall, gridPos, Quaternion.identity);
+		// Vector3 gridPos = new Vector3 (x - 2f, 0, y - 0.5f);
+		Vector3 gridPos = new Vector3(x - 0.5f, 0, y -0.5f);
+		//Instantiate (hall, gridPos, Quaternion.identity);
 
 		Vector3 pos = new Vector3 (x, 0, y);
 		// for horizontal straight hallway =
-		gridPos = new Vector3 (x - 0.5f, 0, y + 1f);
-		//Instantiate (hall, gridPos, Quaternion.AngleAxis (90, new Vector3 (0, 1, 0)));
+		//gridPos = new Vector3 (x - 0.5f, 0, y + 1f);
+		// Instantiate (hall, gridPos, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
 
 		// If no top opening
 		if (room.walls [(int)Room.Wall.top]) {
