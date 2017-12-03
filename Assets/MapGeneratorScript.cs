@@ -17,35 +17,28 @@ public class MapGeneratorScript : MonoBehaviour {
 	public int randomFillPercent;
 
 	public Transform wall;
-
 	public Transform hallCorner;
-
 	public Transform hallStraight;
-
 	public Transform hallCross;
-
 	public Transform hallT;
-
-	public Transform hall;
-
 	public Transform photo;
 
-	public Sprite pic;
-
 	List<Room> rooms;
-	int[,] map;
+	Hall[,] map;
 
+	private double radius;
 
-	private double radius = 4;
+	private enum Hall {e, r, h, v, c_tr, c_br, t_r, t_l, t_d, t_u, x};
 
 	void Start() {
 		GenerateRooms ();
 	}
 
 	void GenerateRooms() {
-		gridSize = numPhotos * numPhotos;
+		gridSize = 10 * numPhotos;
+		radius = 1.0/numPhotos * 35.0;
 		rooms = new List<Room> ();
-		map = new int[gridSize, gridSize];
+		map = new Hall[numPhotos, numPhotos];
 		RandomFillMap ();
 		drawRooms ();
 	}
@@ -59,10 +52,292 @@ public class MapGeneratorScript : MonoBehaviour {
 
 		for (int x = 0; x < numPhotos; x++) {
 			for (int y = 0; y < numPhotos; y++) {
-				map[x,y] = (pseudo.Next(0,100) < randomFillPercent)?1: 0;
+				// map[x,y] = (pseudo.Next(0,100) < randomFillPercent)?1: 0;
 				if (pseudo.Next (0, 100) < randomFillPercent) {
-					Room newRoom = new Room (x, y, numPhotos, numPhotos);
+					map [x, y] = Hall.r;
+					Room newRoom = new Room (x, y, 10, 10);
 					rooms.Add (newRoom);
+				} else {
+					map [x, y] = Hall.e;
+				}
+			}
+		}
+	}
+
+	void drawRooms() {
+	  if (rooms != null) {
+			foreach (Room room in rooms) {
+				foreach (Room room2 in rooms) {
+					if (room2 != room) {
+						if (room.getDistanceFrom (room2) < radius) {
+							// DrawHallway (room, room2);
+							makeNeighbors(room, room2);
+						}
+					}
+				}
+			}
+			foreach (Room room in rooms) {
+				drawRoom (room);
+			}
+		}
+
+		for (int x = 0; x < numPhotos; x++) {
+			for (int y = 0; y < numPhotos; y++) {
+					float xPos = -gridSize/2 + 10 * x;
+					float yPos = -gridSize/2 + 10 * y;
+					Vector3 pos = new Vector3(xPos, 0, yPos);
+					// Instantiate(hallCross, pos, Quaternion.identity);
+					drawHallUnit(map[x,y], pos);
+			}
+		}
+	}
+
+	void drawHallUnit(Hall type, Vector3 pos) {
+		switch (type) {
+		case Hall.e:
+			return;
+		case Hall.r:
+			return;
+		case Hall.h:
+			Instantiate(hallStraight, pos, Quaternion.AngleAxis(90, new Vector3(0,1,0)));
+			return;
+		case Hall.v:
+			Instantiate(hallStraight, pos, Quaternion.identity);
+			return;
+		case Hall.c_br:
+			Instantiate (hallCorner, pos, Quaternion.AngleAxis(180, new Vector3(0,1,0)));
+			return;
+		case Hall.c_tr:
+			Instantiate (hallCorner, pos, Quaternion.AngleAxis(90, new Vector3(0,1,0)));
+			return;
+		case Hall.t_d:
+			Instantiate (hallT, pos, Quaternion.AngleAxis(-90, new Vector3(0,1,0)));
+			return;
+		case Hall.t_l:
+			Instantiate (hallT, pos, Quaternion.identity);
+			return;
+		case Hall.t_r:
+			Instantiate (hallT, pos, Quaternion.AngleAxis(180, new Vector3(0,1,0)));
+			return;
+		case Hall.t_u:
+			Instantiate (hallT, pos, Quaternion.AngleAxis(90, new Vector3(0,1,0)));
+			return;
+		case Hall.x:
+			Instantiate (hallCross, pos, Quaternion.identity);
+			return;
+		}
+	}
+
+	void giantSwitch (Hall type) {
+		switch (type) {
+		case Hall.c_tr:
+			return;
+		case Hall.c_br:
+			return;
+		case Hall.t_d:
+			return;
+		case Hall.t_l:
+			return;
+		case Hall.t_r:
+			return;
+		case Hall.t_u:
+			return;
+		case Hall.h:
+			return;
+		case Hall.v:
+			return;
+		}
+	}
+
+	void modifyHallUnit(int x, int y, Hall add) {
+		Hall prev = map [x, y];
+		if (add == prev) {
+			return;
+		}
+		switch (prev) {
+		case Hall.e:
+			return;
+		case Hall.r:
+			return;
+		case Hall.x:
+			return;
+		case Hall.c_tr:
+			switch (add) {
+			case Hall.c_tr:
+				return;
+			case Hall.c_br:
+				map [x, y] = Hall.t_r;
+				return;
+			case Hall.t_d:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.t_l:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.t_r:
+				map [x, y] = Hall.t_r;
+				return;
+			case Hall.t_u:
+				map [x, y] = Hall.t_u;
+				return;
+			case Hall.h:
+				map [x, y] = Hall.t_u;
+				return;
+			case Hall.v:
+				map [x, y] = Hall.t_r;
+				return;
+			}
+			return;
+		case Hall.c_br:
+			switch (add) {
+			case Hall.c_tr:
+				map [x, y] = Hall.t_r;
+				return;
+			case Hall.c_br:
+				return;
+			case Hall.t_d:
+				map [x, y] = Hall.t_d;
+				return;
+			case Hall.t_l:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.t_r:
+				map [x, y] = Hall.t_r;
+				return;
+			case Hall.t_u:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.h:
+				map [x, y] = Hall.t_u;
+				return;
+			case Hall.v:
+				map [x, y] = Hall.t_r;
+				return;
+			}
+			return;
+		case Hall.t_d:
+			switch (add) {
+			case Hall.c_br:
+				return;
+			case Hall.h:
+				return;
+			}
+			map [x, y] = Hall.x;
+			return;
+		case Hall.t_l:
+			if (add == Hall.t_l || add == Hall.v) {
+				return;
+			}
+			map [x, y] = Hall.x;
+			return;
+		case Hall.t_r:
+			if (add == Hall.c_tr || add == Hall.c_br || add == Hall.v) {
+				return;
+			}
+			map [x, y] = Hall.x;
+			return;
+		case Hall.t_u:
+			if (add == Hall.c_tr || add == Hall.h) {
+				return;
+			}
+			map [x, y] = Hall.x;
+			return;
+		case Hall.h:
+			switch (add) {
+			case Hall.c_tr:
+				map [x, y] = Hall.t_u;
+				return;
+			case Hall.c_br:
+				map [x, y] = Hall.t_d;
+				return;
+			case Hall.t_d:
+				return;
+			case Hall.t_l:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.t_r:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.t_u:
+				return;
+			case Hall.h:
+				return;
+			case Hall.v:
+				map [x, y] = Hall.x;
+				return;
+			}
+			return;
+		case Hall.v:
+			switch (add) {
+			case Hall.c_tr:
+				map [x, y] = Hall.t_r;
+				return;
+			case Hall.c_br:
+				map [x, y] = Hall.t_r;
+				return;
+			case Hall.t_d:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.t_l:
+				return;
+			case Hall.t_r:
+				return;
+			case Hall.t_u:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.h:
+				map [x, y] = Hall.x;
+				return;
+			case Hall.v:
+				return;
+			}
+			return;
+		}
+	}
+
+	void makeNeighbors(Room room1, Room room2) {
+		int x1 = (int)room1.centerX;
+		int x2 = (int)room2.centerX;
+		int y1 = (int)room1.centerY;
+		int y2 = (int)room2.centerY;
+
+		if (x1 == x2) {
+			if (y1 > y2) {
+				int temp = y1;
+				y2 = y1;
+				y1 = temp;
+			}
+			for (int j = y1; j < y2; j++) {
+				if (map [x1, j] != Hall.r) {
+					map [x1, j] = Hall.h;
+				}
+			}
+			//return;
+		}
+
+
+		if (x1 < x2) {
+			for (int i = x1; i < x2 - 1; i++) {
+				if (map [i, y1] != Hall.r) {
+					map [i, y1] = Hall.h;
+				}
+			}
+
+			if (y1 > y2) {
+				if (map [x2 - 1, y1] != Hall.r) {
+					map [x2 - 1, y1] = Hall.c_tr;
+				}
+				int temp = y1;
+				y2 = y1;
+				y1 = temp;
+			} else {
+				if (map [x2 - 1, y1] != Hall.r) {
+					map [x2 - 1, y1] = Hall.c_br;
+				}			
+			}
+			for (int i = y1 + 1; i < y2; i++) {
+				if (map [x2, i] != Hall.r) {
+					map [x2, i] = Hall.t_d;
 				}
 			}
 		}
@@ -74,15 +349,7 @@ public class MapGeneratorScript : MonoBehaviour {
 		int w = room.width;
 		int h = room.height;
 
-		// for straight hallway ||
-		// Vector3 gridPos = new Vector3 (x - 2f, 0, y - 0.5f);
-		Vector3 gridPos = new Vector3(x - 0.5f, 0, y -0.5f);
-		//Instantiate (hall, gridPos, Quaternion.identity);
-
 		Vector3 pos = new Vector3 (x, 0, y);
-		// for horizontal straight hallway =
-		//gridPos = new Vector3 (x - 0.5f, 0, y + 1f);
-		// Instantiate (hall, gridPos, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
 
 		// If no top opening
 		if (room.walls [(int)Room.Wall.top]) {
@@ -150,78 +417,8 @@ public class MapGeneratorScript : MonoBehaviour {
 		// Add photos
 		Vector3 position = new Vector3 (x, 2, y);
 		Instantiate (photo, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
-		//Instantiate (pic, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
 
-	}
 
-	void drawRooms() {
-	  if (rooms != null) {
-			foreach (Room room in rooms) {
-				drawRoom (room);
-				foreach (Room room2 in rooms) {
-					if (room2 != room) {
-						if (room.getDistanceFrom (room2) < radius) {
-							// DrawHallway (room, room2);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	void makeNeighbors(Room r1, Room r2) {
-		
-	}
-
-	void DrawHallway(Room room1, Room room2) {
-		int x1 = room1.centerX;
-		int x2 = room2.centerX;
-		int y1 = room1.centerY;
-		int y2 = room2.centerY;
-
-		// Same horizontal axis
-		if (x1 == x2) {
-			float x = -gridSize / 2 + x1 * 10 + 0.5f;
-			float miny = -gridSize / 2 + Mathf.Min (y1, y2) * 10 + 0.5f;
-			float maxy = -gridSize / 2 + Mathf.Max (y1, y2) * 10 + 0.5f;
-			for (int i = (int)miny; i < (int)maxy; i++) {
-				Vector3 pos = new Vector3 (x, 0, i);
-				pos = new Vector3 (x - 1, 0, i);
-			}
-		} else if (y1 == y2) {
-			float y = -gridSize / 2 + y1 * 10 + 0.5f;
-			float minx = -gridSize / 2 + Mathf.Min (x1, x2) * 10 + 0.5f;
-			float maxx = -gridSize / 2 + Mathf.Max (x1, x2) * 10 + 0.5f;
-			for (int i = (int)minx; i < (int)maxx; i++) {
-				Vector3 pos = new Vector3 (i, 0, y);
-				pos = new Vector3 (i, 0, y-1);
-			}
-		} else {
-			//only draw if room1 is to the left of room2
-			if (x1 < x2) {
-				float startx = -gridSize / 2 + x1 * 10 + 0.5f;
-				float endx = -gridSize / 2 + x2 * 10 + 0.5f;
-				float starty = -gridSize / 2 + y1 * 10 + 0.5f;
-				float endy = -gridSize / 2 + y2 * 10 + 0.5f;
-				for (int i = (int) Mathf.Floor(startx + room1.width/2); i <= (int)endx; i++) {
-					Vector3 pos = new Vector3 (i, 0, starty + 1);
-					Instantiate(hall, pos, Quaternion.identity);
-					pos = new Vector3 (i, 0, starty - 2);
-					Instantiate(hall, pos, Quaternion.identity);
-				}
-				if (starty > endy) {
-					float temp = endy;
-					endy = starty;
-					starty = temp;
-				}
-				for (int i = (int)starty - 1; i < (int)endy; i++) {
-					Vector3 pos = new Vector3 (endx + 1, 0, i);
-					Instantiate(hall, pos, Quaternion.identity);
-					pos = new Vector3 (endx - 2, 0, i);
-					Instantiate(hall, pos, Quaternion.identity);
-				}
-			}
-		}
 	}
 
 }
