@@ -86,7 +86,6 @@ public class MapGeneratorScript : MonoBehaviour {
 					float xPos = -gridSize/2 + 10 * x;
 					float yPos = -gridSize/2 + 10 * y;
 					Vector3 pos = new Vector3(xPos, 0, yPos);
-					// Instantiate(hallCross, pos, Quaternion.identity);
 					drawHallUnit(map[x,y], pos);
 			}
 		}
@@ -156,6 +155,7 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 		switch (prev) {
 		case Hall.e:
+			map [x, y] = add;
 			return;
 		case Hall.r:
 			return;
@@ -308,9 +308,7 @@ public class MapGeneratorScript : MonoBehaviour {
 				y1 = temp;
 			}
 			for (int j = y1; j < y2; j++) {
-				if (map [x1, j] != Hall.r) {
-					map [x1, j] = Hall.h;
-				}
+				modifyHallUnit (x1, j, Hall.v);
 			}
 			//return;
 		}
@@ -318,27 +316,19 @@ public class MapGeneratorScript : MonoBehaviour {
 
 		if (x1 < x2) {
 			for (int i = x1; i < x2 - 1; i++) {
-				if (map [i, y1] != Hall.r) {
-					map [i, y1] = Hall.h;
-				}
+				modifyHallUnit (i, y1, Hall.h);
 			}
 
 			if (y1 > y2) {
-				if (map [x2 - 1, y1] != Hall.r) {
-					map [x2 - 1, y1] = Hall.c_tr;
-				}
+				modifyHallUnit (x2, y1, Hall.c_tr);
 				int temp = y1;
 				y2 = y1;
 				y1 = temp;
 			} else {
-				if (map [x2 - 1, y1] != Hall.r) {
-					map [x2 - 1, y1] = Hall.c_br;
-				}			
+				modifyHallUnit (x2, y1, Hall.c_br);
 			}
 			for (int i = y1 + 1; i < y2; i++) {
-				if (map [x2, i] != Hall.r) {
-					map [x2, i] = Hall.t_d;
-				}
+				modifyHallUnit (x2, i, Hall.v);
 			}
 		}
 	}
