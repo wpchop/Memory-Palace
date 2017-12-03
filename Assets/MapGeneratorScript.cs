@@ -30,6 +30,8 @@ public class MapGeneratorScript : MonoBehaviour {
 
 	public Transform photo;
 
+	public Sprite pic;
+
 	List<Room> rooms;
 	int[,] map;
 
@@ -144,18 +146,11 @@ public class MapGeneratorScript : MonoBehaviour {
 				}
 			}
 		}
-			
-		// Left and right walls
-//		for (int j = -h / 2; j < h / 2; j++) {
-//			Vector3 pos = new Vector3 (x + w/2 - 1, 0, y + j);
-//			Instantiate (wall, pos, Quaternion.identity);
-//			pos = new Vector3 (x - w / 2, 0, y + j);
-//			Instantiate (wall, pos, Quaternion.identity);
-//		}
 
 		// Add photos
 		Vector3 position = new Vector3 (x, 2, y);
-		Instantiate (photo, position, Quaternion.identity);
+		Instantiate (photo, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
+		//Instantiate (pic, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
 
 	}
 
@@ -166,13 +161,11 @@ public class MapGeneratorScript : MonoBehaviour {
 				foreach (Room room2 in rooms) {
 					if (room2 != room) {
 						if (room.getDistanceFrom (room2) < radius) {
-							//DrawHallway (room, room2);
+							// DrawHallway (room, room2);
 						}
 					}
 				}
 			}
-
-
 		}
 	}
 
