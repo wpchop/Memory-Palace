@@ -91,6 +91,7 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 	}
 
+
 	void drawHallUnit(Hall type, Vector3 pos) {
 		switch (type) {
 		case Hall.e:
@@ -126,28 +127,11 @@ public class MapGeneratorScript : MonoBehaviour {
 			return;
 		}
 	}
-
-	void giantSwitch (Hall type) {
-		switch (type) {
-		case Hall.c_tr:
-			return;
-		case Hall.c_br:
-			return;
-		case Hall.t_d:
-			return;
-		case Hall.t_l:
-			return;
-		case Hall.t_r:
-			return;
-		case Hall.t_u:
-			return;
-		case Hall.h:
-			return;
-		case Hall.v:
-			return;
-		}
-	}
-
+		
+	/**
+	 * Giant convoluted function that handles logic for adding hallway
+	 * components.
+	 * */
 	void modifyHallUnit(int x, int y, Hall add) {
 		Hall prev = map [x, y];
 		if (add == prev) {
@@ -301,35 +285,42 @@ public class MapGeneratorScript : MonoBehaviour {
 		int y1 = (int)room1.centerY;
 		int y2 = (int)room2.centerY;
 
+		int xmin = Math.Min (x1, x2);
+		int xmax = Math.Max (x1, x2);
+
+		int ymin = Math.Min (y1, y2);
+		int ymax = Math.Max (y1, y2);
+
 		if (x1 == x2) {
-			if (y1 > y2) {
-				int temp = y1;
-				y2 = y1;
-				y1 = temp;
-			}
-			for (int j = y1; j < y2; j++) {
+			for (int j = ymin; j < ymax; j++) {
 				modifyHallUnit (x1, j, Hall.v);
 			}
-			//return;
+			return;
 		}
 
-
+		if (y1 == y2) {
+			for (int i = xmin; i < xmax; i++) {
+				modifyHallUnit (i, y1, Hall.h);
+			}
+			return;
+		}
+			
 		if (x1 < x2) {
 			for (int i = x1; i < x2 - 1; i++) {
 				modifyHallUnit (i, y1, Hall.h);
 			}
-
 			if (y1 > y2) {
 				modifyHallUnit (x2, y1, Hall.c_tr);
-				int temp = y1;
-				y2 = y1;
-				y1 = temp;
+				for (int i = ymin + 1; i < ymax; i++) {
+					modifyHallUnit (x2, i, Hall.v);
+				}
 			} else {
 				modifyHallUnit (x2, y1, Hall.c_br);
+				for (int i = ymin; i < ymax - 1; i++) {
+					modifyHallUnit (x2, i, Hall.v);
+				}
 			}
-			for (int i = y1 + 1; i < y2; i++) {
-				modifyHallUnit (x2, i, Hall.v);
-			}
+
 		}
 	}
 
@@ -405,10 +396,8 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 
 		// Add photos
-		Vector3 position = new Vector3 (x, 2, y);
+		Vector3 position = new Vector3 (x - 3f, 2f, y + 3.5f);
 		Instantiate (photo, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
-
-
 	}
 
 }

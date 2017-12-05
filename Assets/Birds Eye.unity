@@ -405,7 +405,7 @@ MonoBehaviour:
   numPhotos: 6
   seed: 
   useRandom: 0
-  randomFillPercent: 40
+  randomFillPercent: 38
   wall: {fileID: 4827696083182330, guid: 855032a54f3b34fcab1de55c9042f180, type: 2}
   hallCorner: {fileID: 4095728516132008, guid: a66784c088e97489491d5042d1e1b433, type: 2}
   hallStraight: {fileID: 4451896668644100, guid: e97a1496c398c46d0b6814db007d6522,
