@@ -4,7 +4,10 @@ using UnityEngine;
 using System.IO;
 
 namespace Palace {
-	
+
+	/**
+	 * Used for testing/debugging photo uploading feature.
+	 * **/
 	public class PhotoCreatorScript : MonoBehaviour {
 
 		public string photoFolder;

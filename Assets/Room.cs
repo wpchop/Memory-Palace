@@ -4,6 +4,9 @@ using UnityEngine;
 
 
 namespace Palace {
+	/**
+	 * Represents a single room in the memory palace.
+	 * */
 	public class Room
 	{
 		public int centerX;
@@ -15,7 +18,7 @@ namespace Palace {
 
 		List<Room> nearestNeighbors;
 
-		Dictionary<Wall, Memory> memories;
+		Dictionary<int, Memory> memories;
 
 		public enum Wall {top, bottom, left, right};
 
@@ -27,7 +30,7 @@ namespace Palace {
 			this.height = height;
 			nearestNeighbors = new List<Room> ();
 			walls = new bool[4];
-			memories = new Dictionary<Wall, Memory>();
+			memories = new Dictionary<int, Memory>();
 		}
 
 		public void addNearestNeighbors(Room neighbor) {
@@ -44,8 +47,12 @@ namespace Palace {
 			walls [(int)wall] = true;
 		}
 
-		public void addMemory(Wall pos, Memory mem) {
+		public void addMemory(int pos, Memory mem) {
 			memories.Add (pos, mem);
+		}
+
+		public Dictionary<int, Memory> getMemories() {
+			return memories;
 		}
 	}
 }

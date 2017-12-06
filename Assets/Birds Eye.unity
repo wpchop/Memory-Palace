@@ -354,7 +354,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1712784120}
-  - component: {fileID: 1712784119}
   - component: {fileID: 1712784121}
   m_Layer: 0
   m_Name: Palace Generator
@@ -363,21 +362,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1712784119
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1712784118}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3c54ec5e6f834e139e873095052bb9f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numPhotos: 0
-  seed: 
-  useRandom: 0
-  randomFillPercent: 35
 --- !u!4 &1712784120
 Transform:
   m_ObjectHideFlags: 0
@@ -402,11 +386,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389073e57ba974eed8de499c64ad3866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numPhotos: 6
+  numPhotos: 7
   seed: 
   useRandom: 0
   photoFilePath: /Users/Wenli/Desktop/Memory Palace/Assets/Photos
-  randomFillPercent: 38
+  randomFillPercent: 25
   wall: {fileID: 4827696083182330, guid: 855032a54f3b34fcab1de55c9042f180, type: 2}
   hallCorner: {fileID: 4095728516132008, guid: a66784c088e97489491d5042d1e1b433, type: 2}
   hallStraight: {fileID: 4451896668644100, guid: e97a1496c398c46d0b6814db007d6522,

@@ -41,7 +41,6 @@ public class MapGeneratorScript : MonoBehaviour {
 	private enum Hall {e, r, h, v, c_tr, c_br, t_r, t_l, t_d, t_u, x};
 
 	void Start() {
-		// memories = new List<Memory> ();
 		createMemories ();
 		GenerateRooms ();
 	}
@@ -61,6 +60,7 @@ public class MapGeneratorScript : MonoBehaviour {
 			Memory memory = new Memory (pic);
 			memories [i] = memory;
 		}
+		Debug.Log ("Number of photos: " + numMemories);
 	}
 
 	/**
@@ -72,7 +72,19 @@ public class MapGeneratorScript : MonoBehaviour {
 		rooms = new List<Room> ();
 		map = new Hall[numPhotos, numPhotos];
 		RandomFillMap ();
+		PlaceMemories ();
 		drawRooms ();
+	}
+
+	void PlaceMemories() {
+		int memcount = 0;
+		int totalMem = memories.Length;
+		foreach (Room r in rooms) {
+			for (int i = 0; i < 4; i++ ) {
+				r.addMemory (i, memories [memcount % totalMem]);
+				memcount++;
+			}
+		}
 	}
 
 	/**
@@ -128,7 +140,8 @@ public class MapGeneratorScript : MonoBehaviour {
 	}
 
 	/**
-	 * Function that draws the different types of hallway components
+	 * Function that draws the different types of hallway components given a 
+	 * type of Hall and position. 
 	 **/
 	void drawHallUnit(Hall type, Vector3 pos) {
 		switch (type) {
@@ -172,7 +185,7 @@ public class MapGeneratorScript : MonoBehaviour {
 	 * component will be needed. For example Hall.h + Hall.v = Hall.x
 	 * Read here
 	 * https://stackoverflow.com/questions/17605603/enum-case-handling-better-to-use-a-switch-or-a-dictionary
-	 * that dictionaries are slower than switch statements for handling enum cases.
+	 * that dictionaries are slower than switch statements for handling enum cases in C#
 	 * Hence, the really long nested switch statements. Apologies for readability.
 	 * */
 	void modifyHallUnit(int x, int y, Hall add) {
@@ -443,20 +456,38 @@ public class MapGeneratorScript : MonoBehaviour {
 				}
 			}
 		}
+			
+		// Adding photos to each room
+		foreach (KeyValuePair<int, Memory> entry in room.getMemories()) {
+			Vector3 photoPos = getPhotoPosition (x, y, entry.Key);
 
-		// Add photos
-		Vector3 position = new Vector3 (x - 3f, 2f, y + 3.5f);
-		GameObject pictureFrame = 
-			(GameObject)Instantiate (photo, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
-		Component [] shaders = pictureFrame.GetComponents(typeof(MeshRenderer));
-		Component shader = shaders[0];
-		MeshRenderer meshRender = (MeshRenderer) shader;
+			GameObject frame = 
+				(GameObject)Instantiate (photo, photoPos, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
+			MeshRenderer mRenderer = (MeshRenderer) frame.GetComponents (typeof(MeshRenderer)) [0];
+			// 1 is the picture, 0 is the frame;
+			Material photoMaterial = mRenderer.materials [1];
+			photoMaterial.mainTexture = entry.Value.getTexture ();
+		}
+			
+		// Example of how to change the position/rotation of the picture:
+		// pictureFrame.transform.rotation = Quaternion.AngleAxis (180, new Vector3 (0, 1, 0));
 
-		// For now, 0 is art, 1 is picture
-		Material pictMaterial = meshRender.materials[1];
+	}
 
+	// Getting the position of each photo
+	private Vector3 getPhotoPosition(float x, float y, int place) {
+		switch (place) {
+		case 1: 
+			return new Vector3 (x - 3f, 2f, y + 3.5f);;
+		case 2:
+			return new Vector3 (x + 2f, 2f, y + 3.5f);
+		case 3:
+			return new Vector3 (x + 1f, 3f, y + 3.5f);
+		case 4:
+			return new Vector3 (x + 1f, 1f, y + 3.5f);
+		}
 
-		pictMaterial.mainTexture = memories[1].getTexture();
+		return new Vector3 (x + 1f, 0f, y + 3.5f);
 	}
 
 }
