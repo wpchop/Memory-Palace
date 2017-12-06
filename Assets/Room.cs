@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+
 
 namespace Palace {
 	public class Room
@@ -13,6 +15,8 @@ namespace Palace {
 
 		List<Room> nearestNeighbors;
 
+		Dictionary<Wall, Memory> memories;
+
 		public enum Wall {top, bottom, left, right};
 
 		public Room (int x, int y, int width, int height)
@@ -23,6 +27,7 @@ namespace Palace {
 			this.height = height;
 			nearestNeighbors = new List<Room> ();
 			walls = new bool[4];
+			memories = new Dictionary<Wall, Memory>();
 		}
 
 		public void addNearestNeighbors(Room neighbor) {
@@ -37,6 +42,10 @@ namespace Palace {
 
 		public void makeDoor(Wall wall) {
 			walls [(int)wall] = true;
+		}
+
+		public void addMemory(Wall pos, Memory mem) {
+			memories.Add (pos, mem);
 		}
 	}
 }

@@ -405,6 +405,7 @@ MonoBehaviour:
   numPhotos: 6
   seed: 
   useRandom: 0
+  photoFilePath: /Users/Wenli/Desktop/Memory Palace/Assets/Photos
   randomFillPercent: 38
   wall: {fileID: 4827696083182330, guid: 855032a54f3b34fcab1de55c9042f180, type: 2}
   hallCorner: {fileID: 4095728516132008, guid: a66784c088e97489491d5042d1e1b433, type: 2}
@@ -412,4 +413,4 @@ MonoBehaviour:
     type: 2}
   hallCross: {fileID: 4697051487195998, guid: 960bbce3475004fe3afca23ee3e50889, type: 2}
   hallT: {fileID: 4264684225402394, guid: 62f0139644252496d810bf027586dfc5, type: 2}
-  photo: {fileID: 478108, guid: 14691c451e07ff94cb94be3f44e72ab7, type: 2}
+  photo: {fileID: 164190, guid: 14691c451e07ff94cb94be3f44e72ab7, type: 2}

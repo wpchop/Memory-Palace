@@ -1,9 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 using Palace;
 using System;
 
+/**
+ * Script for generating a random memory palace based on input parameters
+ * and filepath to folder containing photos.
+ * */
 public class MapGeneratorScript : MonoBehaviour {
 
 	public int numPhotos;
@@ -13,6 +18,8 @@ public class MapGeneratorScript : MonoBehaviour {
 	public string seed;
 	public bool useRandom;
 
+	public string photoFilePath;
+
 	[Range(0,100)]
 	public int randomFillPercent;
 
@@ -21,19 +28,44 @@ public class MapGeneratorScript : MonoBehaviour {
 	public Transform hallStraight;
 	public Transform hallCross;
 	public Transform hallT;
-	public Transform photo;
+	public GameObject photo;
 
 	List<Room> rooms;
 	Hall[,] map;
+	// List<Memory> memories;
+
+	Memory [] memories;
 
 	private double radius;
 
 	private enum Hall {e, r, h, v, c_tr, c_br, t_r, t_l, t_d, t_u, x};
 
 	void Start() {
+		// memories = new List<Memory> ();
+		createMemories ();
 		GenerateRooms ();
 	}
 
+	/**
+	 * Loads photos from {photoFilepath} folder into textures and 
+	 * adds them to a collection of memories.
+	 * */
+	void createMemories() {
+		PhotoCreator photoCreator = new PhotoCreator (photoFilePath);
+		List<string> photoFiles = photoCreator.getPhotoFiles ();
+		int numMemories = photoFiles.Count;
+		memories = new Memory[numMemories];
+
+		for (int i = 0; i < numMemories; i++) {
+			Texture2D pic = photoCreator.getTexture (photoFiles[i]);
+			Memory memory = new Memory (pic);
+			memories [i] = memory;
+		}
+	}
+
+	/**
+	 * Setting up parameters and grid for palace construction.
+	 * */
 	void GenerateRooms() {
 		gridSize = 10 * numPhotos;
 		radius = 1.0/numPhotos * 35.0;
@@ -43,6 +75,9 @@ public class MapGeneratorScript : MonoBehaviour {
 		drawRooms ();
 	}
 
+	/**
+	 * Randomly places room onto grid of the palace
+	 * */
 	void RandomFillMap() {
 		if (useRandom) {
 			seed = Time.time.ToString();
@@ -52,7 +87,6 @@ public class MapGeneratorScript : MonoBehaviour {
 
 		for (int x = 0; x < numPhotos; x++) {
 			for (int y = 0; y < numPhotos; y++) {
-				// map[x,y] = (pseudo.Next(0,100) < randomFillPercent)?1: 0;
 				if (pseudo.Next (0, 100) < randomFillPercent) {
 					map [x, y] = Hall.r;
 					Room newRoom = new Room (x, y, 10, 10);
@@ -64,6 +98,9 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Starting point for drawing the palace
+	 * */
 	void drawRooms() {
 	  if (rooms != null) {
 			foreach (Room room in rooms) {
@@ -285,6 +322,9 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Sets up the hallway components between two rooms.
+	 * */
 	void makeNeighbors(Room room1, Room room2) {
 		int x1 = (int)room1.centerX;
 		int x2 = (int)room2.centerX;
@@ -330,6 +370,9 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Draws a single room and the photos placed within that room
+	 * */
 	void drawRoom(Room room) {
 		float x = -gridSize / 2 + room.centerX * 10 + 0.5f;
 		float y = -gridSize / 2 + room.centerY * 10 + 0.5f;
@@ -403,7 +446,17 @@ public class MapGeneratorScript : MonoBehaviour {
 
 		// Add photos
 		Vector3 position = new Vector3 (x - 3f, 2f, y + 3.5f);
-		Instantiate (photo, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
+		GameObject pictureFrame = 
+			(GameObject)Instantiate (photo, position, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
+		Component [] shaders = pictureFrame.GetComponents(typeof(MeshRenderer));
+		Component shader = shaders[0];
+		MeshRenderer meshRender = (MeshRenderer) shader;
+
+		// For now, 0 is art, 1 is picture
+		Material pictMaterial = meshRender.materials[1];
+
+
+		pictMaterial.mainTexture = memories[1].getTexture();
 	}
 
 }
