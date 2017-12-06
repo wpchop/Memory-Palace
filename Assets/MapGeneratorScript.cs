@@ -70,7 +70,6 @@ public class MapGeneratorScript : MonoBehaviour {
 				foreach (Room room2 in rooms) {
 					if (room2 != room) {
 						if (room.getDistanceFrom (room2) < radius) {
-							// DrawHallway (room, room2);
 							makeNeighbors(room, room2);
 						}
 					}
@@ -91,7 +90,9 @@ public class MapGeneratorScript : MonoBehaviour {
 		}
 	}
 
-
+	/**
+	 * Function that draws the different types of hallway components
+	 **/
 	void drawHallUnit(Hall type, Vector3 pos) {
 		switch (type) {
 		case Hall.e:
@@ -130,7 +131,12 @@ public class MapGeneratorScript : MonoBehaviour {
 		
 	/**
 	 * Giant convoluted function that handles logic for adding hallway
-	 * components.
+	 * components. Based on the previous and new hallway component, a new
+	 * component will be needed. For example Hall.h + Hall.v = Hall.x
+	 * Read here
+	 * https://stackoverflow.com/questions/17605603/enum-case-handling-better-to-use-a-switch-or-a-dictionary
+	 * that dictionaries are slower than switch statements for handling enum cases.
+	 * Hence, the really long nested switch statements. Apologies for readability.
 	 * */
 	void modifyHallUnit(int x, int y, Hall add) {
 		Hall prev = map [x, y];
