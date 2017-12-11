@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05c4edcbf89394b179f33c1308b607e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filepath: Photos
+  photoFolder: wlj
   pictureFrame: {fileID: 164190, guid: 14691c451e07ff94cb94be3f44e72ab7, type: 2}
 --- !u!4 &324052752
 Transform:

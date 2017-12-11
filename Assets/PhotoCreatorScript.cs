@@ -23,6 +23,7 @@ namespace Palace {
 					Debug.Log ("PHOTO NAME: " + photoNames [s]);
 				}
 			}
+			getTexture ("/Users/Wenli/Desktop/Memory Palace/Assets/Photos/IMG_9253");
 		}
 
 		void getTexture(string filePath) {

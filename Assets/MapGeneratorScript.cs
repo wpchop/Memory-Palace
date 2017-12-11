@@ -54,6 +54,7 @@ public class MapGeneratorScript : MonoBehaviour {
 		List<string> photoFiles = photoCreator.getPhotoFiles ();
 		int numMemories = photoFiles.Count;
 		memories = new Memory[numMemories];
+		//List<Memory> memList = new List<Memory> ();
 
 		for (int i = 0; i < numMemories; i++) {
 			Texture2D pic = photoCreator.getTexture (photoFiles[i]);
@@ -80,7 +81,7 @@ public class MapGeneratorScript : MonoBehaviour {
 		int memcount = 0;
 		int totalMem = memories.Length;
 		foreach (Room r in rooms) {
-			for (int i = 0; i < 4; i++ ) {
+			for (int i = 0; i < 8; i++ ) {
 				r.addMemory (i, memories [memcount % totalMem]);
 				memcount++;
 			}
@@ -338,7 +339,7 @@ public class MapGeneratorScript : MonoBehaviour {
 	/**
 	 * Sets up the hallway components between two rooms.
 	 * */
-	void makeNeighbors(Room room1, Room room2) {
+	private void makeNeighbors(Room room1, Room room2) {
 		int x1 = (int)room1.centerX;
 		int x2 = (int)room2.centerX;
 		int y1 = (int)room1.centerY;
@@ -386,7 +387,7 @@ public class MapGeneratorScript : MonoBehaviour {
 	/**
 	 * Draws a single room and the photos placed within that room
 	 * */
-	void drawRoom(Room room) {
+	private void drawRoom(Room room) {
 		float x = -gridSize / 2 + room.centerX * 10 + 0.5f;
 		float y = -gridSize / 2 + room.centerY * 10 + 0.5f;
 		int w = room.width;
@@ -460,13 +461,21 @@ public class MapGeneratorScript : MonoBehaviour {
 		// Adding photos to each room
 		foreach (KeyValuePair<int, Memory> entry in room.getMemories()) {
 			Vector3 photoPos = getPhotoPosition (x, y, entry.Key);
+			Quaternion photoRot = getPhotoRotation (entry.Key / 2);
+
+			// facing forward: Quaternion.AngleAxis (180, new Vector3 (0, 1, 0));
 
 			GameObject frame = 
-				(GameObject)Instantiate (photo, photoPos, Quaternion.AngleAxis (180, new Vector3 (0, 1, 0)));
+				(GameObject)Instantiate (photo, photoPos, photoRot);
 			MeshRenderer mRenderer = (MeshRenderer) frame.GetComponents (typeof(MeshRenderer)) [0];
 			// 1 is the picture, 0 is the frame;
 			Material photoMaterial = mRenderer.materials [1];
-			photoMaterial.mainTexture = entry.Value.getTexture ();
+			Texture2D photoTexture = entry.Value.getTexture ();
+			photoMaterial.mainTexture = photoTexture;
+
+			if (photoTexture.width < photoTexture.height) {
+				frame.transform.localScale = frame.transform.localScale + new Vector3 (-0.5f, 1f, 0f);
+			}
 		}
 			
 		// Example of how to change the position/rotation of the picture:
@@ -477,17 +486,40 @@ public class MapGeneratorScript : MonoBehaviour {
 	// Getting the position of each photo
 	private Vector3 getPhotoPosition(float x, float y, int place) {
 		switch (place) {
-		case 1: 
+		case 0: 
 			return new Vector3 (x - 3f, 2f, y + 3.5f);;
-		case 2:
+		case 1:
 			return new Vector3 (x + 2f, 2f, y + 3.5f);
+		case 2:
+			return new Vector3 (x + 3.5f, 2f, y - 3f);
 		case 3:
-			return new Vector3 (x + 1f, 3f, y + 3.5f);
-		case 4:
-			return new Vector3 (x + 1f, 1f, y + 3.5f);
+			return new Vector3 (x + 3.5f, 2f, y + 2f);
+		case 4: 
+			return new Vector3 (x - 3f, 2f, y - 4.5f);;
+		case 5:
+			return new Vector3 (x + 2f, 2f, y - 4.5f);
+		case 6:
+			return new Vector3 (x - 4.5f, 2f, y - 3f);
+		case 7:
+			return new Vector3 (x - 4.5f, 2f, y + 2f);
 		}
 
 		return new Vector3 (x + 1f, 0f, y + 3.5f);
+	}
+
+	private Quaternion getPhotoRotation(int place) {
+		switch (place) {
+		case 0: 
+			return Quaternion.AngleAxis (180, new Vector3 (0, 1, 0));
+		case 1:
+			return Quaternion.AngleAxis (-90, new Vector3 (0, 1, 0));
+		case 2:
+			return Quaternion.AngleAxis (0, new Vector3 (0, 1, 0));
+		case 3:
+			return Quaternion.AngleAxis (90, new Vector3 (0, 1, 0));
+		}
+
+		return Quaternion.AngleAxis (180, new Vector3 (0, 1, 0));
 	}
 
 }
